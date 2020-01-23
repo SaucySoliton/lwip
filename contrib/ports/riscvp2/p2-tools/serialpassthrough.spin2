@@ -1,0 +1,25 @@
+CON		
+		d1 		= 63    ' rx
+		q1		= 54    ' ppp tx
+
+		d2		= 52    ' ppp rx
+		q2 		= 62    ' tx
+
+
+DAT		org
+
+                hubset  ##%1_000001_0000011000_1111_10_00       'config PLL, 20MHz/2*25*1 = 250MHz
+                waitx   ##20_000_000 / 200                      'allow crystal+PLL 5ms to stabilize
+                hubset  ##%1_000001_0000011000_1111_10_11       'switch to PLL
+
+
+loop
+		testp   #d1	wc
+	if_c    drvh    #q1
+	if_nc   drvl	#q1
+		testp   #d2	wc
+	if_c    drvh    #q2
+	if_nc   drvl	#q2
+		jmp	#loop
+
+
